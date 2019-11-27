@@ -46,7 +46,7 @@ void CSVReader::open(const std::string& filename)
 		file->close();
 	file = new std::ifstream(name);
 	if (file->is_open())
-		printf("File parsed: %s\n", filename.c_str());
+		printf("CSVReader: File parsed: %s\n", filename.c_str());
 	else
-		printf("Could not open file for parsing: %s\n", filename.c_str());
+		printf("CSVReader: Could not open file for parsing: %s\n", filename.c_str());
 }

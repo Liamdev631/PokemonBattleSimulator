@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Ability.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)BattleState.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CSVReader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)DamageClass.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Language.h" />

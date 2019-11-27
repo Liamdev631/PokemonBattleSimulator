@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Battle.h" />
+    <ClInclude Include="MoveCode.h" />
     <ClInclude Include="MoveUtil.h" />
     <ClInclude Include="Move_Base.h" />
     <ClInclude Include="Move_RegularAttack.h" />

@@ -1,17 +1,16 @@
 #pragma once
-#include "Pokemon.h"
 #include <memory>
-#include <array>
 #include <map>
 #include "PlayerAction.h"
+#include "BattleState.h"
 
 using namespace std;
 
 constexpr auto PartySize = 1;
 constexpr auto PlayerCount = 2;
 
-typedef array<Pokemon, PartySize> Team;
 typedef array<PlayerAction, PlayerCount> ActionBuffer;
+typedef BattleState<PartySize, PlayerCount> State;
 
 class Move_Base;
 
@@ -23,20 +22,28 @@ public:
 	bool isActive;
 
 private:
-	array<Team, PlayerCount> activePokemon;
+	// Holds the current state of the battle
+	State _state;
+
 	bool _isActionSubmitted[PlayerCount];
+	
+	// The turn number. The first turn has a value of 1
 	int turnCount;
+
+	// Holds the battles current user input
 	ActionBuffer _actionBuffer;
 	
+	// Holds references to the functions that hold the code for moves
 	array<Move_Base*, NumberOfMoves> _moveTable;
 
+	// Initializes the move table for this type of battle
 	void setupMoveTable();
 
 public:
 	Battle();
 	~Battle();
 
-	void init(const array<Team, PlayerCount>& teams);
+	void init(const State::TeamSet& teams);
 	void stop();
 
 	// Updates the game state. Most the the battle processing runs in here.

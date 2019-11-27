@@ -19,5 +19,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MoveEffect.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)TestUtil.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)PlayerAction.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)BattleState.h" />
   </ItemGroup>
 </Project>

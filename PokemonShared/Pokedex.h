@@ -7,7 +7,7 @@
 
 using namespace std;
 
-constexpr size_t NumberOfPokemon = 151;
+constexpr size_t NumberOfPokemon = 386 + 1;
 constexpr size_t TypeNameLength = 16;
 
 // Type advantage table types

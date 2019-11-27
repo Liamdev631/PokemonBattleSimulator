@@ -30,7 +30,7 @@ public:
 	}
 };
 
-const enum struct MoveID : uint16_t
+enum struct MoveID : uint16_t
 {
 	NONE = 0,
 	Pound = 1,

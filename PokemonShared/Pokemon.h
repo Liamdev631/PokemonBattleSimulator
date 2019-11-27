@@ -5,6 +5,9 @@
 #include "Status.h"
 #include "Ability.h"
 
+constexpr int NumMoves = 4;
+constexpr int PokemonNameLength = 16;
+
 class Pokemon
 {
 public:
@@ -16,14 +19,14 @@ public:
 public:
 	// Species base
 	SpeciesID speciesID;
-	char name[16];
+	char name[PokemonNameLength];
 	uint16_t baseStats[NumStats]; // Access with Stat enum
 	Weight weight;
 	Type type1;
 	Type type2;
 
 	// Instance based
-	MoveID moves[4];
+	MoveID moves[NumMoves];
 	uint16_t maximumHealth;
 	uint16_t currentHealth;
 	Level level;
@@ -31,9 +34,10 @@ public:
 	Ability ability;
 	uint8_t sleepTimer;
 
-	Pokemon() = default;
+	// Default constructor
+	Pokemon();
 
-	// Copy Constructor
+	// Copy constructor
 	Pokemon(const Pokemon& other);
 
 	// Pokemon generators
@@ -45,8 +49,12 @@ public:
 	uint16_t getBaseStat(const Stat stat) const;
 
 	// Battle functionality
-	void init();
 
+	// Fully restores the pokemons status
+	void initialize();
+
+	// Causes the pokemon to take damage
+	// Returns the amount of damage that was actually done
 	uint16_t takeDamage(uint16_t damage);
 
 	uint16_t heal(uint16_t amount);

@@ -13,17 +13,17 @@ struct PlayerAction
 	PlayerActionType type;
 	union
 	{
-		MoveID move;
+		uint8_t move;
 		uint8_t pokemon;
 	};
 
 	PlayerAction()
-		: type(PlayerActionType::Attack), user(0), move(MoveID::NONE)
+		: type(PlayerActionType::Attack), user(0), move(0)
 	{
 
 	}
 	PlayerAction(PlayerActionType type)
-		: type(type), user(0), move(MoveID::NONE)
+		: type(type), user(0), move(0)
 	{
 
 	}

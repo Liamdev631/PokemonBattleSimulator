@@ -42,7 +42,7 @@ void Battle::tick()
 
 	// Fastest pokemon moves first
 	array<int, 2> moveOrders;
-	if (activePokemon[0][0].getStatWithMods(Stat::Spe) > activePokemon[1][0].getStatWithMods(Stat::Spe))
+	if (_state.teams[0][0].getStatWithMods(Stat::Spe) > _state.teams[1][0].getStatWithMods(Stat::Spe))
 		moveOrders = { 0, 1 };
 	else
 		moveOrders = { 1, 0 };
@@ -58,8 +58,8 @@ void Battle::tick()
 		if (isOver)
 			break; 
 
-		auto& attacker = activePokemon[moveOrders[i]][0];
-		auto& defender = activePokemon[moveOrders[otherPlayer(i)]][0];
+		auto& attacker = _state.teams[moveOrders[i]][0];
+		auto& defender = _state.teams[moveOrders[otherPlayer(i)]][0];
 		auto& attackerAction = _actionBuffer[moveOrders[i]];
 		auto& defenderAction = _actionBuffer[moveOrders[otherPlayer(i)]];
 
@@ -82,7 +82,7 @@ void Battle::tick()
 	}
 }
 
-void Battle::init(const array<Team, PlayerCount>& teams)
+void Battle::init(const State::TeamSet& teams)
 {
 #ifdef _DEBUG
 	if (isActive)
@@ -92,13 +92,8 @@ void Battle::init(const array<Team, PlayerCount>& teams)
 	}
 #endif
 
-	for (int player = 0; player < PlayerCount; player++)
-		for (int mon = 0; mon < PartySize; mon++)
-		{
-			auto& slot = activePokemon[player][mon];
-			slot = teams[player][mon];
-			slot.init();
-		}
+	_state = State(teams);
+	_state.initialize();
 
 	turnCount = 1;
 	needsTick = true;
@@ -136,7 +131,7 @@ void Battle::submitPlayerAction(PlayerAction action)
 void Battle::simulateAttack(Pokemon& attacker, Pokemon& defender, PlayerAction& attackerAction, PlayerAction& defenderAction)
 {
 	assert(attackerAction.type == PlayerActionType::Attack);
-	auto& move = Pokedex::get().getMove(attackerAction.move);
+	auto& move = Pokedex::get().getMove(attacker.moves[attackerAction.move]);
 	printf("%s used %s.\n", attacker.name, move.name);
 
 	// Call the attacks function from the table

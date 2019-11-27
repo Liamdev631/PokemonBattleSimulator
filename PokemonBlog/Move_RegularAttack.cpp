@@ -6,7 +6,7 @@
 
 void Move_RegularAttack::apply(Pokemon* attacker, Pokemon* defender, PlayerAction* attackerAction, PlayerAction* defenderAction) const
 {
-	auto move = Pokedex::get().getMove(attackerAction->move);
+	auto move = Pokedex::get().getMove(attacker->moves[attackerAction->move]);
 
 	// Make some assertions that should always pass with this move effect
 	DebugAssert(move.power != 0, "A RegularAttack move must have a power > 0!");

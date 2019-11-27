@@ -6,7 +6,7 @@
 
 void Move_SleepTarget::apply(Pokemon* attacker, Pokemon* defender, PlayerAction* attackerAction, PlayerAction* defenderAction) const
 {
-	auto move = Pokedex::get().getMove(attackerAction->move);
+	auto move = Pokedex::get().getMove(attacker->moves[attackerAction->move]);
 
 	// Make some assertions that should always pass with this move effect
 	DebugAssert(move.power == 0, "A SleepTarget move must have a power of 0!");
