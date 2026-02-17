@@ -10,6 +10,7 @@ import time
 os.makedirs("static/csv", exist_ok=True)
 os.makedirs("static/gen1", exist_ok=True)
 os.makedirs("static/gen1/images", exist_ok=True)
+os.makedirs("static/gen1/images/back", exist_ok=True)
 
 # Helper to normalize names
 def normalize(name):
@@ -216,30 +217,45 @@ with open("static/gen1/learnsets.csv", "w", newline="") as f:
 print("Learnsets scraped.")
 
 # 4. Scrape Images
-print("Scraping Gen 1 Images (FireRed/LeafGreen)...")
+print("Scraping Gen 1 Images (FireRed/LeafGreen) - Front & Back...")
 for pid, identifier, name in pokemon_list:
-    # URL for FireRed/LeafGreen sprites
-    # https://img.pokemondb.net/sprites/firered-leafgreen/normal/bulbasaur.png
-    
     # Check for special cases
     url_name = identifier
     if identifier == "nidoran-f": url_name = "nidoran-f"
     elif identifier == "nidoran-m": url_name = "nidoran-m"
     elif identifier == "mr-mime": url_name = "mr-mime"
     
-    img_url = f"https://img.pokemondb.net/sprites/firered-leafgreen/normal/{url_name}.png"
-    img_path = f"static/gen1/images/{pid}.png"
+    # Front Sprite
+    img_url_front = f"https://img.pokemondb.net/sprites/firered-leafgreen/normal/{url_name}.png"
+    img_path_front = f"static/gen1/images/{pid}.png"
     
+    # Back Sprite
+    img_url_back = f"https://img.pokemondb.net/sprites/firered-leafgreen/back-normal/{url_name}.png"
+    img_path_back = f"static/gen1/images/back/{pid}.png"
+    
+    # Download Front
     try:
-        r = requests.get(img_url)
-        if r.status_code == 200:
-            with open(img_path, "wb") as f:
-                f.write(r.content)
-            # print(f"Downloaded image for {name}")
-        else:
-            print(f"Failed to download image for {name}: {r.status_code}")
+        if not os.path.exists(img_path_front):
+            r = requests.get(img_url_front)
+            if r.status_code == 200:
+                with open(img_path_front, "wb") as f:
+                    f.write(r.content)
+            else:
+                print(f"Failed to download front image for {name}: {r.status_code}")
     except Exception as e:
-        print(f"Error downloading image for {name}: {e}")
+        print(f"Error downloading front image for {name}: {e}")
+
+    # Download Back
+    try:
+        if not os.path.exists(img_path_back):
+            r = requests.get(img_url_back)
+            if r.status_code == 200:
+                with open(img_path_back, "wb") as f:
+                    f.write(r.content)
+            else:
+                print(f"Failed to download back image for {name}: {r.status_code}")
+    except Exception as e:
+        print(f"Error downloading back image for {name}: {e}")
     
     # Be nice to the server
     # time.sleep(0.1)

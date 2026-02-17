@@ -30,6 +30,8 @@ pub struct PokemonSpecies {
     pub name: String,
     pub stats: Stats,
     pub types: Vec<u32>,
+    #[serde(default)]
+    pub learnset: Vec<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
