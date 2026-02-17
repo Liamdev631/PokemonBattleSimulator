@@ -6,6 +6,7 @@ This project is a simple pokemon battle simulator suite. It is written in Rust f
 2. Use only the data within ./static/csv as the source of truth for pokemon stats, moves, and types.
 
 # Project Structure
-This project consists of 2 main components, implemented as seperate projects with their own repositories:
-1. The pokemon battle simulator library
-2. A command line interface (CLI) for the simulator
+This project consists of 3 main components, implemented as seperate projects with their own repositories:
+1. The pokemon battle simulator library.
+2. A web interface for the simulator, complete with graphics and interactive elements.
+3. A python interface for the simulator, complete with a simple and intuitive API. The python interface should be designed to be as easy to use as possible, with a focus on readability and simplicity. The API should provide a way for users to create and simulate pokemon battles, massively in parellel with large batches, as well as access the results of those simulations for RL agent training.

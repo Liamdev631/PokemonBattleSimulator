@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Battle Simulator</title>
+    <style>
+        /* CSS to mimic Game Boy Green/Monochrome style */
+        @font-face {
+            font-family: 'GameBoy';
+            src: local('Courier New'); /* Fallback */
+        }
+
+        body {
+            background-color: #202020;
+            color: #0f380f;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #game-frame {
+            background-color: #8b9bb4; /* Game Boy Color Plastic */
+            padding: 20px 20px 40px 20px;
+            border-radius: 10px 10px 40px 10px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+        }
+        #screen-border {
+            background-color: #555;
+            padding: 20px;
+            border-radius: 10px 10px 30px 10px;
+        }
+        #game-container {
+            width: 480px; /* 160 * 3 */
+            height: 432px; /* 144 * 3 */
+            background-color: #9bbc0f; /* GB Screen Color */
+            border: 4px solid #4a503a;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .battle-scene {
+            flex: 1;
+            position: relative;
+            /* border-bottom: 4px solid #0f380f; */
+        }
+        .pokemon-sprite {
+            position: absolute;
+            width: 144px; /* 48 * 3 */
+            height: 144px;
+            image-rendering: pixelated;
+        }
+        #opponent-sprite {
+            top: 30px;
+            right: 60px;
+        }
+        #player-sprite {
+            bottom: 30px;
+            left: 60px;
+            transform: scaleX(-1); /* Flip back sprite approximation */
+        }
+        .hud {
+            position: absolute;
+            background-color: #9bbc0f; /* Transparent? No, GB had white/bg boxes */
+            border: 3px solid #0f380f;
+            padding: 5px;
+            width: 200px;
+            box-shadow: 3px 3px 0px #8bac0f;
+            font-weight: bold;
+        }
+        #opponent-hud {
+            top: 20px;
+            left: 20px;
+        }
+        #player-hud {
+            bottom: 120px; /* Above controls */
+            right: 20px;
+        }
+        .controls {
+            height: 140px;
+            display: flex;
+            background-color: #9bbc0f;
+            border-top: 4px solid #0f380f;
+            position: relative;
+            z-index: 5;
+        }
+        .message-box {
+            flex: 2;
+            padding: 15px;
+            font-size: 20px;
+            border-right: 4px solid #0f380f;
+            background-color: #ffffff; /* White bg for text usually in GB Color, but Monochrome was just light */
+            background-color: #9bbc0f;
+            color: #0f380f;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+        .action-menu {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 5px;
+            background-color: #ffffff;
+            border-left: 4px solid #0f380f;
+        }
+        button {
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 18px;
+            color: #0f380f;
+            cursor: pointer;
+            text-align: left;
+            text-transform: uppercase;
+            font-weight: bold;
+            padding: 5px;
+        }
+        button:hover::before {
+            content: "▶ ";
+            position: absolute;
+            margin-left: -20px;
+        }
+        
+        /* Selection Overlay */
+        #selection-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            color: #000;
+        }
+        .pokemon-item {
+            cursor: pointer;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+        }
+        .pokemon-item:hover {
+            background-color: #eee;
+        }
+        .pokemon-item img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-frame">
+        <div id="screen-border">
+            <div id="game-container">
+                <div id="selection-screen">
+                    <h2>SELECT POKEMON</h2>
+                    <div id="pokemon-list">Loading Pokedex...</div>
+                </div>
+
+                <div class="battle-scene">
+                    <div id="opponent-hud" class="hud">
+                        <div id="opponent-name">RATTATA</div>
+                        <div id="opponent-hp-bar">:L5</div>
+                        <div>HP: <span id="opponent-hp">20/20</span></div>
+                    </div>
+                    <img id="opponent-sprite" class="pokemon-sprite" src="" alt="">
+                    
+                    <img id="player-sprite" class="pokemon-sprite" src="" alt="">
+                    <div id="player-hud" class="hud">
+                        <div id="player-name">PIKACHU</div>
+                        <div id="player-hp-bar">:L5</div>
+                        <div>HP: <span id="player-hp">20/20</span></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="message-box" id="message-box">
+                        What will <span id="msg-name">PIKACHU</span> do?
+                    </div>
+                    <div class="action-menu" id="main-menu">
+                        <button onclick="showMoves()">FIGHT</button>
+                        <button>PKMN</button>
+                        <button>ITEM</button>
+                        <button>RUN</button>
+                    </div>
+                    <div class="action-menu" id="move-menu" style="display: none; grid-template-columns: 1fr;">
+                        <!-- Moves will be populated here -->
+                        <button onclick="backToMain()">CANCEL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h3 style="text-align: center; color: #333; margin-top: 10px;">Nintendo GAME BOY™</h3>
+    </div>
+
+    <script>
+        let allPokemon = [];
+        let playerPokemon = null;
+        let opponentPokemon = null;
+
+        async function loadPokemon() {
+            try {
+                const res = await fetch('/api/pokemon');
+                allPokemon = await res.json();
+                const list = document.getElementById('pokemon-list');
+                list.innerHTML = '';
+                
+                allPokemon.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'pokemon-item';
+                    
+                    const img = document.createElement('img');
+            img.src = `/static/gen1/images/${p.id}.png`;
+            div.appendChild(img);
+                    
+                    const span = document.createElement('span');
+                    span.innerText = `#${p.id} ${p.name.toUpperCase()}`;
+                    div.appendChild(span);
+                    
+                    div.onclick = () => selectPokemon(p);
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error("Failed to load pokemon", e);
+                document.getElementById('pokemon-list').innerText = "Error loading Pokemon data.";
+            }
+        }
+
+        function selectPokemon(p) {
+            if (!playerPokemon) {
+                playerPokemon = p;
+                document.querySelector('#selection-screen h2').innerText = "SELECT OPPONENT";
+                window.scrollTo(0,0);
+            } else {
+                opponentPokemon = p;
+                document.getElementById('selection-screen').style.display = 'none';
+                startBattle();
+            }
+        }
+
+        function startBattle() {
+            // Setup Player
+            document.getElementById('player-name').innerText = playerPokemon.name.toUpperCase();
+            document.getElementById('player-hp').innerText = `${playerPokemon.stats.hp}/${playerPokemon.stats.hp}`;
+            document.getElementById('player-sprite').src = `/static/gen1/images/${playerPokemon.id}.png`;
+            document.getElementById('msg-name').innerText = playerPokemon.name.toUpperCase();
+
+            // Setup Opponent
+            document.getElementById('opponent-name').innerText = opponentPokemon.name.toUpperCase();
+            document.getElementById('opponent-hp').innerText = `${opponentPokemon.stats.hp}/${opponentPokemon.stats.hp}`;
+            document.getElementById('opponent-sprite').src = `/static/gen1/images/${opponentPokemon.id}.png`;
+        }
+
+        function showMoves() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('move-menu').style.display = 'grid';
+            
+            const moveMenu = document.getElementById('move-menu');
+            moveMenu.innerHTML = '';
+            
+            // Dummy moves
+            const moves = ['TACKLE', 'GROWL', 'SCRATCH', 'EMBER'];
+            moves.forEach(m => {
+                const btn = document.createElement('button');
+                btn.innerText = m;
+                btn.onclick = () => attack(m);
+                moveMenu.appendChild(btn);
+            });
+            
+            const cancel = document.createElement('button');
+            cancel.innerText = 'CANCEL';
+            cancel.onclick = backToMain;
+            moveMenu.appendChild(cancel);
+        }
+
+        function backToMain() {
+            document.getElementById('move-menu').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'grid';
+            document.getElementById('message-box').innerHTML = `What will <br>${playerPokemon.name.toUpperCase()} do?`;
+        }
+
+        function attack(moveName) {
+            document.getElementById('message-box').innerText = `${playerPokemon.name.toUpperCase()} used ${moveName}!`;
+            
+            // Simple animation effect
+            let blink = 0;
+            const interval = setInterval(() => {
+                document.getElementById('opponent-sprite').style.visibility = blink % 2 === 0 ? 'hidden' : 'visible';
+                blink++;
+                if (blink > 5) {
+                    clearInterval(interval);
+                    document.getElementById('opponent-sprite').style.visibility = 'visible';
+                    
+                    setTimeout(() => {
+                        document.getElementById('message-box').innerText = "It's effective!";
+                        setTimeout(() => {
+                            backToMain();
+                        }, 1500);
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        loadPokemon();
+    </script>
+</body>
+</html>
